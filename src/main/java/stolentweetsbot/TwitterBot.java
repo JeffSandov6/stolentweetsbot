@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import twitter4j.Query;
+import twitter4j.QueryResult;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
@@ -58,15 +60,15 @@ public class TwitterBot {
 			}
 			
 			StringBuilder strBuilder = new StringBuilder(String.format("@%s hi, ", curStatus.getUser().getScreenName()));
-			//check if tweet was stolen here
+			checkIfTweetWasStolen(strBuilder, potentialStolenTweetStatus);
 			
 			//TODO: IF TWEET WASNT STOLEN, MAYBE CHECK TO SEE IF IT WAS ALTERED SLIGHTLY?
 			
 			
 			
 			StatusUpdate responseStatus = new StatusUpdate(strBuilder.toString());
-//			long userId = curStatus.getUser().getId();
-//			responseStatus.setInReplyToStatusId(userId);
+			long tweetId = curStatus.getId();
+			responseStatus.setInReplyToStatusId(tweetId);
 			System.out.println(responseStatus.getStatus());
 			
 			try {
@@ -85,6 +87,56 @@ public class TwitterBot {
 	
 	
 	public void checkIfTweetWasStolen(StringBuilder strBuilder, Status potentialStolenTweetStatus) {
+		System.out.println("the tweet we're checking on is " + potentialStolenTweetStatus.getText());
+		Query query = new Query(potentialStolenTweetStatus.getText());
+		try {
+			QueryResult queryResults = twitterInstance.search(query);
+			int count = 0;
+			
+			while(true) {
+				List<Status> list = queryResults.getTweets();
+				
+				count += list.size();
+				for(Status tweet : list)
+				{
+					count++;
+					System.out.println("the user is " + tweet.getUser());
+					System.out.println(tweet.getText());
+					System.out.println("the count is " + count);
+				}
+				
+				if(count >= 500)
+				{
+					break;
+				}
+				else if(queryResults.hasNext())
+				{
+					queryResults.nextQuery();;
+				}
+				else
+				{
+					break;
+				}
+			}
+			
+			if(count > 1 && count < 500) 
+			{
+				strBuilder.append("this tweet has been stolen " + count + "times");
+			}
+			else if(count >= 500)
+			{
+				strBuilder.append("this tweet has been stolen over 500 times");
+			}
+			else 
+			{
+				strBuilder.append("this tweet seems to have only been tweeted once");
+			}
+			
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
 	
