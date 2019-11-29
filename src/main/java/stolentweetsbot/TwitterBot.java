@@ -57,7 +57,14 @@ public class TwitterBot {
 				continue;
 			}
 			
-			StatusUpdate responseStatus = new StatusUpdate(String.format("@%s hi", curStatus.getUser().getScreenName()));
+			StringBuilder strBuilder = new StringBuilder(String.format("@%s hi, ", curStatus.getUser().getScreenName()));
+			//check if tweet was stolen here
+			
+			//TODO: IF TWEET WASNT STOLEN, MAYBE CHECK TO SEE IF IT WAS ALTERED SLIGHTLY?
+			
+			
+			
+			StatusUpdate responseStatus = new StatusUpdate(strBuilder.toString());
 //			long userId = curStatus.getUser().getId();
 //			responseStatus.setInReplyToStatusId(userId);
 			System.out.println(responseStatus.getStatus());
@@ -75,6 +82,13 @@ public class TwitterBot {
 			System.out.println("--------------------------------------------- \n\n\n\n");
 		}
 	}
+	
+	
+	public void checkIfTweetWasStolen(StringBuilder strBuilder, Status potentialStolenTweetStatus) {
+		
+	}
+	
+	
 	
 	
 	
